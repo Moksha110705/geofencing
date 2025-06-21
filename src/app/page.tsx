@@ -79,7 +79,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background" suppressHydrationWarning>
       <Header />
       <main className="flex-1 overflow-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto grid gap-8 lg:grid-cols-5">
