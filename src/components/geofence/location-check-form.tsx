@@ -51,7 +51,7 @@ export function AttendanceCheckForm({ employees, onSubmit, isLoading }: Attendan
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" suppressHydrationWarning>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="employeeId"
