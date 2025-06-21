@@ -1,46 +1,55 @@
 "use server";
 
-import type { CheckLocationResult } from "@/types";
+import type { AttendanceResult } from "@/types";
 
-// This is a mock perimeter for demonstration purposes.
-// In a real application, this would be retrieved from a database based on the device or organization.
-// It defines a simple rectangle around Downtown LA.
-const MOCK_ALLOWED_PERIMETER = [
-  { latitude: 34.0522, longitude: -118.2437 }, // NE
-  { latitude: 34.0522, longitude: -118.2537 }, // NW
-  { latitude: 34.0422, longitude: -118.2537 }, // SW
-  { latitude: 34.0422, longitude: -118.2437 }, // SE
-];
+// Mock database for organization's required locations
+const MOCK_ORGANIZATION_LOCATION: Record<string, string> = {
+  "Innovate Inc.": "New York",
+  "Solutions Corp": "San Francisco",
+};
 
-export async function checkDeviceLocation(
-  deviceId: string,
+// Mock IP-to-Location service
+const MOCK_IP_TO_LOCATION: Record<string, string> = {
+  "8.8.8.8": "New York", // Google DNS in NY
+  "1.1.1.1": "San Francisco", // Cloudflare DNS in SF
+  "208.67.222.222": "London", // OpenDNS
+  "104.16.132.229": "San Francisco", // Example of a website IP
+};
+
+export async function checkAttendance(
+  employeeId: string,
   organizationName: string,
-  latitude: number,
-  longitude: number
-): Promise<CheckLocationResult> {
-  // For a simple rectangle, find the min/max lat/lon.
-  const lats = MOCK_ALLOWED_PERIMETER.map(p => p.latitude);
-  const lons = MOCK_ALLOWED_PERIMETER.map(p => p.longitude);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-  const minLon = Math.min(...lons);
-  const maxLon = Math.max(...lons);
+  ipAddress: string
+): Promise<AttendanceResult> {
 
-  const isInside =
-    latitude >= minLat &&
-    latitude <= maxLat &&
-    longitude >= minLon &&
-    longitude <= maxLon;
+  const requiredLocation = MOCK_ORGANIZATION_LOCATION[organizationName];
+  const ipLocation = MOCK_IP_TO_LOCATION[ipAddress];
 
-  if (isInside) {
+  if (!requiredLocation) {
     return {
-      breachType: "none",
-      alertMessage: "Device is within the designated perimeter. No breach detected.",
+      status: "absent",
+      message: `Organization '${organizationName}' has no location assigned.`,
+    };
+  }
+
+  if (!ipLocation) {
+    return {
+      status: "absent",
+      message: `Could not determine location for IP address: ${ipAddress}.`,
+    };
+  }
+  
+  const isPresent = ipLocation === requiredLocation;
+
+  if (isPresent) {
+    return {
+      status: "present",
+      message: `Attendance confirmed for ${employeeId} from IP at '${ipLocation}'.`,
     };
   } else {
     return {
-      breachType: "exit",
-      alertMessage: "Device has exited the allowed perimeter.",
+      status: "absent",
+      message: `Employee IP is at '${ipLocation}', but required location is '${requiredLocation}'.`,
     };
   }
 }

@@ -1,19 +1,20 @@
 
-export interface CheckLocationResult {
-  breachType: "exit" | "none";
-  alertMessage: string;
+export interface AttendanceResult {
+  status: "present" | "absent";
+  message: string;
 }
 
-export interface Device {
+export interface Employee {
   id: string;
   name: string;
   organization: string;
 }
 
-export interface Breach extends CheckLocationResult {
+export interface AttendanceRecord extends AttendanceResult {
   id: string;
-  deviceId: string;
-  deviceName: string;
+  employeeId: string;
+  employeeName: string;
   organizationName: string;
+  ipAddress: string;
   timestamp: string;
 }

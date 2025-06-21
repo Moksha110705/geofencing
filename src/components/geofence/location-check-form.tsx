@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Building, Loader2, Smartphone } from "lucide-react";
+import { Building, Loader2, Server, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,59 +23,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Device } from "@/types";
+import type { Employee } from "@/types";
 
 const formSchema = z.object({
-  deviceId: z.string({ required_error: "Please select a device." }),
-  latitude: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= -90 && parseFloat(val) <= 90, {
-    message: "Enter a valid latitude (-90 to 90).",
-  }),
-  longitude: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) >= -180 && parseFloat(val) <= 180, {
-    message: "Enter a valid longitude (-180 to 180).",
-  }),
+  employeeId: z.string({ required_error: "Please select an employee." }),
+  ipAddress: z.string().ip({ message: "Please enter a valid IP address." }),
 });
 
-export type LocationCheckFormValues = z.infer<typeof formSchema>;
+export type AttendanceFormValues = z.infer<typeof formSchema>;
 
-interface LocationCheckFormProps {
-  devices: Device[];
-  onSubmit: (values: LocationCheckFormValues) => void;
+interface AttendanceCheckFormProps {
+  employees: Employee[];
+  onSubmit: (values: AttendanceFormValues) => void;
   isLoading: boolean;
 }
 
-export function LocationCheckForm({ devices, onSubmit, isLoading }: LocationCheckFormProps) {
-  const form = useForm<LocationCheckFormValues>({
+export function AttendanceCheckForm({ employees, onSubmit, isLoading }: AttendanceCheckFormProps) {
+  const form = useForm<AttendanceFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      latitude: "34.06", // Default to a location near the geofence
-      longitude: "-118.25",
+      ipAddress: "8.8.8.8", // Default to an IP in a valid location
     },
   });
 
-  const selectedDeviceId = form.watch("deviceId");
-  const selectedDevice = devices.find(d => d.id === selectedDeviceId);
+  const selectedEmployeeId = form.watch("employeeId");
+  const selectedEmployee = employees.find(d => d.id === selectedEmployeeId);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" suppressHydrationWarning>
         <FormField
           control={form.control}
-          name="deviceId"
+          name="employeeId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Device</FormLabel>
+              <FormLabel>Employee</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a device to check..." />
+                    <SelectValue placeholder="Select an employee..." />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {devices.map(device => (
-                    <SelectItem key={device.id} value={device.id}>
+                  {employees.map(employee => (
+                    <SelectItem key={employee.id} value={employee.id}>
                       <div className="flex items-center gap-2">
-                        <Smartphone className="h-4 w-4 text-muted-foreground" />
-                        <span>{device.name}</span>
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>{employee.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -86,43 +80,32 @@ export function LocationCheckForm({ devices, onSubmit, isLoading }: LocationChec
           )}
         />
         
-        {selectedDevice && (
+        {selectedEmployee && (
           <div className="p-3 bg-secondary/50 rounded-md border border-secondary text-sm text-secondary-foreground flex items-center gap-2">
             <Building className="h-4 w-4" />
-            Organization: <span className="font-semibold">{selectedDevice.organization}</span>
+            Organization: <span className="font-semibold">{selectedEmployee.organization}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="latitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Current Latitude</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., 34.0522" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="longitude"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Current Longitude</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., -118.2437" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="ipAddress"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>IP Address</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Server className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="e.g., 8.8.8.8" {...field} className="pl-9"/>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+       
         <FormDescription>
-            The mock geofence is around Downtown Los Angeles (approx. 34.05, -118.24).
+            Mock locations are New York (e.g., 8.8.8.8) and San Francisco (e.g., 1.1.1.1).
         </FormDescription>
 
         <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}>
@@ -132,7 +115,7 @@ export function LocationCheckForm({ devices, onSubmit, isLoading }: LocationChec
               Checking...
             </>
           ) : (
-            "Check Location"
+            "Check Attendance"
           )}
         </Button>
       </form>

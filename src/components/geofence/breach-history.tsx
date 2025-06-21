@@ -14,54 +14,57 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Breach } from "@/types";
-import { ListChecks, LogOut } from "lucide-react";
+import type { AttendanceRecord } from "@/types";
+import { ListChecks, LogIn, LogOut } from "lucide-react";
 import { ClientTime } from "./client-time";
 
-interface BreachHistoryProps {
-  breaches: Breach[];
+interface AttendanceHistoryProps {
+  attendanceRecords: AttendanceRecord[];
 }
 
-function BreachEvent({ breachType }: { breachType: Breach['breachType'] }) {
-  if (breachType === "exit") {
-    return <Badge variant="destructive" className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-800"><LogOut className="mr-1 h-3 w-3" />Exit</Badge>;
+function AttendanceEvent({ status }: { status: AttendanceRecord['status'] }) {
+  if (status === "present") {
+    return <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-800"><LogIn className="mr-1 h-3 w-3" />Present</Badge>;
   }
-  return null;
+  return <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800"><LogOut className="mr-1 h-3 w-3" />Absent</Badge>;
 }
 
-export function BreachHistory({ breaches }: BreachHistoryProps) {
+export function AttendanceHistory({ attendanceRecords }: AttendanceHistoryProps) {
   return (
     <Card className="shadow-lg h-full">
       <CardHeader>
-        <CardTitle className="font-headline">Attendance & Breach History</CardTitle>
+        <CardTitle className="font-headline">Attendance History</CardTitle>
         <CardDescription>
-          A real-time log of all detected entry and exit events.
+          A real-time log of all attendance checks based on IP location.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {breaches.length > 0 ? (
+        {attendanceRecords.length > 0 ? (
           <div className="border rounded-md">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[120px]">Organization</TableHead>
-                  <TableHead>Device</TableHead>
-                  <TableHead className="text-center">Event</TableHead>
-                  <TableHead>Alert Message</TableHead>
+                  <TableHead>Employee</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead>IP Address</TableHead>
+                  <TableHead>Details</TableHead>
                   <TableHead className="text-right">Time</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {breaches.map((breach) => (
-                  <TableRow key={breach.id}>
-                    <TableCell className="font-medium">{breach.organizationName}</TableCell>
-                    <TableCell>{breach.deviceName}</TableCell>
-                    <TableCell className="text-center">
-                       <BreachEvent breachType={breach.breachType} />
+                {attendanceRecords.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell>
+                        <div className="font-medium">{record.employeeName}</div>
+                        <div className="text-xs text-muted-foreground">{record.organizationName}</div>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{breach.alertMessage}</TableCell>
+                    <TableCell className="text-center">
+                       <AttendanceEvent status={record.status} />
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{record.ipAddress}</TableCell>
+                    <TableCell className="text-muted-foreground">{record.message}</TableCell>
                     <TableCell className="text-right text-muted-foreground text-xs">
-                      <ClientTime timestamp={breach.timestamp} />
+                      <ClientTime timestamp={record.timestamp} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -75,9 +78,9 @@ export function BreachHistory({ breaches }: BreachHistoryProps) {
                     <ListChecks className="h-8 w-8 text-muted-foreground" />
                 </div>
             </div>
-            <p className="font-semibold">No events yet</p>
+            <p className="font-semibold">No attendance records yet</p>
             <p className="text-sm text-muted-foreground">
-              Trigger a location check to see the history here.
+              Check an employee's attendance to see the history here.
             </p>
           </div>
         )}

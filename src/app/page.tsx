@@ -2,67 +2,69 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
-
-import type { Device, Breach } from "@/types";
-import { Header } from "@/components/layout/header";
-import { LocationCheckForm, type LocationCheckFormValues } from "@/components/geofence/location-check-form";
-import { BreachHistory } from "@/components/geofence/breach-history";
-import { checkDeviceLocation } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
+import type { Employee, AttendanceRecord } from "@/types";
+import { Header } from "@/components/layout/header";
+// Note: File names are not changed, but component names inside are.
+import { AttendanceCheckForm, type AttendanceFormValues } from "@/components/geofence/location-check-form";
+import { AttendanceHistory } from "@/components/geofence/breach-history";
+import { checkAttendance } from "./actions";
+
 // Mock data to simulate a database
-const mockDevices: Device[] = [
-  { id: "dev_001", name: "Sales Laptop 1", organization: "Innovate Inc." },
-  { id: "dev_002", name: "Support Phone", organization: "Innovate Inc." },
-  { id: "dev_003", name: "Field Tablet", organization: "Solutions Corp" },
+const mockEmployees: Employee[] = [
+  { id: "emp_001", name: "Alice Johnson", organization: "Innovate Inc." },
+  { id: "emp_002", name: "Bob Williams", organization: "Innovate Inc." },
+  { id: "emp_003", name: "Charlie Brown", organization: "Solutions Corp" },
 ];
 
 export default function Home() {
-  const [breaches, setBreaches] = useState<Breach[]>([]);
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLocationCheck = async (data: LocationCheckFormValues) => {
+  const handleAttendanceCheck = async (data: AttendanceFormValues) => {
     setIsLoading(true);
-    const selectedDevice = mockDevices.find(d => d.id === data.deviceId);
-    if (!selectedDevice) {
+    const selectedEmployee = mockEmployees.find(d => d.id === data.employeeId);
+    if (!selectedEmployee) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Selected device not found.",
+        description: "Selected employee not found.",
       });
       setIsLoading(false);
       return;
     }
 
     try {
-      const result = await checkDeviceLocation(
-        selectedDevice.id,
-        selectedDevice.organization,
-        parseFloat(data.latitude),
-        parseFloat(data.longitude)
+      const result = await checkAttendance(
+        selectedEmployee.id,
+        selectedEmployee.organization,
+        data.ipAddress
       );
 
-      if (result.breachType !== "none") {
-        const newBreach: Breach = {
-          ...result,
-          id: `br_${new Date().getTime()}`,
-          deviceId: selectedDevice.id,
-          deviceName: selectedDevice.name,
-          organizationName: selectedDevice.organization,
-          timestamp: new Date().toISOString(),
-        };
-        setBreaches(prev => [newBreach, ...prev]);
+      const newRecord: AttendanceRecord = {
+        ...result,
+        id: `rec_${new Date().getTime()}`,
+        employeeId: selectedEmployee.id,
+        employeeName: selectedEmployee.name,
+        organizationName: selectedEmployee.organization,
+        ipAddress: data.ipAddress,
+        timestamp: new Date().toISOString(),
+      };
+      setAttendanceRecords(prev => [newRecord, ...prev]);
+
+      if (result.status === "present") {
         toast({
-          title: "Geofence Alert",
-          description: result.alertMessage,
+          title: "Attendance Marked: Present",
+          description: result.message,
         });
       } else {
-         toast({
-          title: "Status Update",
-          description: "Device is within the designated perimeter. No breach detected.",
+        toast({
+          variant: "destructive",
+          title: "Attendance Marked: Absent",
+          description: result.message,
         });
       }
 
@@ -72,7 +74,7 @@ export default function Home() {
         variant: "destructive",
         title: "An unexpected error occurred",
         description:
-          error instanceof Error ? error.message : "Could not check device location. Please try again.",
+          error instanceof Error ? error.message : "Could not check attendance. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -87,22 +89,22 @@ export default function Home() {
           <div className="lg:col-span-2">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="font-headline">Simulate Location Check</CardTitle>
+                <CardTitle className="font-headline">Simulate Attendance Check</CardTitle>
                 <CardDescription>
-                  Manually trigger a location check for a registered device.
+                  Manually check an employee's attendance using their IP address.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <LocationCheckForm
-                  devices={mockDevices}
-                  onSubmit={handleLocationCheck}
+                <AttendanceCheckForm
+                  employees={mockEmployees}
+                  onSubmit={handleAttendanceCheck}
                   isLoading={isLoading}
                 />
               </CardContent>
             </Card>
           </div>
           <div className="lg:col-span-3">
-            <BreachHistory breaches={breaches} />
+            <AttendanceHistory attendanceRecords={attendanceRecords} />
           </div>
         </div>
       </main>

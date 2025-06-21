@@ -10,7 +10,7 @@ export function Header() {
               <MapPin className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold font-headline text-primary">
-              GeoTrack Attendance
+              IP-Based Attendance
             </h1>
           </div>
         </div>
