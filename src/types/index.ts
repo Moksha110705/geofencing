@@ -1,4 +1,8 @@
-import type { DetermineEntryExitOutput } from "@/ai/flows/determine-entry-exit";
+
+export interface CheckLocationResult {
+  breachType: "exit" | "none";
+  alertMessage: string;
+}
 
 export interface Device {
   id: string;
@@ -6,7 +10,7 @@ export interface Device {
   organization: string;
 }
 
-export interface Breach extends DetermineEntryExitOutput {
+export interface Breach extends CheckLocationResult {
   id: string;
   deviceId: string;
   deviceName: string;
