@@ -1,3 +1,34 @@
+<a href="https://studio.firebase.google.com/import?url=https%3A%2F%2Fgithub.com%2FMoksha110705%2Fgeofencing">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://cdn.firebasestudio.dev/btn/open_dark_32.svg">
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://cdn.firebasestudio.dev/btn/open_light_32.svg">
+    <img
+      height="32"
+      alt="Open in Firebase Studio"
+      src="https://cdn.firebasestudio.dev/btn/open_blue_32.svg">
+  </picture>
+</a>
+
+
+
+<a href="https://studio.firebase.google.com/import?url=https%3A%2F%2Fgithub.com%2FMoksha110705%2Fgeofencing">
+  <picture>
+    <source
+      media="(prefers-color-scheme: dark)"
+      srcset="https://cdn.firebasestudio.dev/btn/continue_dark_32.svg">
+    <source
+      media="(prefers-color-scheme: light)"
+      srcset="https://cdn.firebasestudio.dev/btn/continue_light_32.svg">
+    <img
+      height="32"
+      alt="Continue in Firebase Studio"
+      src="https://cdn.firebasestudio.dev/btn/continue_blue_32.svg">
+  </picture>
+</a>
 # IP-Based Attendance System
 
 This is a Next.js application built in Firebase Studio that demonstrates a simple, IP-based attendance tracking system. It allows for the simulation of employees checking their attendance, where their location is verified based on their IP address against their organization's required location.
