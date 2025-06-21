@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState, useEffect } from "react";
 import { Building, Loader2, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -45,8 +44,6 @@ interface LocationCheckFormProps {
 }
 
 export function LocationCheckForm({ devices, onSubmit, isLoading }: LocationCheckFormProps) {
-  const [selectedDevice, setSelectedDevice] = useState<Device | undefined>(undefined);
-
   const form = useForm<LocationCheckFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,10 +53,7 @@ export function LocationCheckForm({ devices, onSubmit, isLoading }: LocationChec
   });
 
   const selectedDeviceId = form.watch("deviceId");
-
-  useEffect(() => {
-    setSelectedDevice(devices.find(d => d.id === selectedDeviceId));
-  }, [selectedDeviceId, devices]);
+  const selectedDevice = devices.find(d => d.id === selectedDeviceId);
 
   return (
     <Form {...form}>
