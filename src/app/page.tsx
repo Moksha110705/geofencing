@@ -71,7 +71,8 @@ export default function Home() {
       toast({
         variant: "destructive",
         title: "An unexpected error occurred",
-        description: "Could not check device location. Please try again.",
+        description:
+          error instanceof Error ? error.message : "Could not check device location. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -79,7 +80,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background" suppressHydrationWarning>
+    <div className="flex flex-col h-full bg-background">
       <Header />
       <main className="flex-1 overflow-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto grid gap-8 lg:grid-cols-5">
