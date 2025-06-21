@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Determines whether a device's movement constitutes entering or exiting the designated area.
+ * @fileOverview Determines whether a device's movement constitutes exiting the designated area.
  *
- * - determineEntryExit - A function that handles the entry/exit determination process.
+ * - determineEntryExit - A function that handles the exit determination process.
  * - DetermineEntryExitInput - The input type for the determineEntryExit function.
  * - DetermineEntryExitOutput - The return type for the determineEntryExit function.
  */
@@ -27,14 +27,13 @@ const PerimeterSchema = z.array(
 const DetermineEntryExitInputSchema = z.object({
   deviceId: z.string().describe('The unique identifier of the device.'),
   currentLocation: DeviceLocationSchema.describe('The current location of the device.'),
-  previousLocations: z.array(DeviceLocationSchema).describe('The history of device locations.'),
   allowedPerimeter: PerimeterSchema,
   organizationName: z.string().describe('The name of the organization associated with the device.'),
 });
 export type DetermineEntryExitInput = z.infer<typeof DetermineEntryExitInputSchema>;
 
 const DetermineEntryExitOutputSchema = z.object({
-  breachType: z.enum(['entry', 'exit', 'none']).describe('The type of breach detected: entry, exit, or none.'),
+  breachType: z.enum(['exit', 'none']).describe("The type of breach detected: 'exit' if outside the perimeter, or 'none' if inside."),
   alertMessage: z.string().describe('A message describing the breach, if any.'),
 });
 export type DetermineEntryExitOutput = z.infer<typeof DetermineEntryExitOutputSchema>;
@@ -47,24 +46,23 @@ const determineEntryExitPrompt = ai.definePrompt({
   name: 'determineEntryExitPrompt',
   input: {schema: DetermineEntryExitInputSchema},
   output: {schema: DetermineEntryExitOutputSchema},
-  prompt: `You are an AI assistant specializing in geofencing and location analysis.
+  prompt: `You are an AI assistant specializing in geofencing analysis. Your task is to determine if a device's current location is inside or outside a specified geographical perimeter.
 
-You are provided with the current location of a device, its recent location history, the allowed perimeter, and the organization it belongs to. Your task is to determine if the device has entered or exited the allowed perimeter.
+You will be given the device's current location and the coordinates that define the allowed perimeter.
+
+- If the device is inside the perimeter, the breach type is 'none'.
+- If the device is outside the perimeter, it's a breach. Classify any breach as an 'exit'.
 
 Device ID: {{{deviceId}}}
 Organization: {{{organizationName}}}
-Current Location: Latitude: {{{currentLocation.latitude}}}, Longitude: {{{currentLocation.longitude}}}, Timestamp: {{{currentLocation.timestamp}}}
-Previous Locations:
-{{#each previousLocations}}
-  Latitude: {{{latitude}}}, Longitude: {{{longitude}}}, Timestamp: {{{timestamp}}}
-{{/each}}
+Current Location: Latitude: {{{currentLocation.latitude}}}, Longitude: {{{currentLocation.longitude}}}
 
-Allowed Perimeter:
+Allowed Perimeter (a series of points defining a polygon):
 {{#each allowedPerimeter}}
-  Latitude: {{{latitude}}}, Longitude: {{{longitude}}}
+  - Latitude: {{{latitude}}}, Longitude: {{{longitude}}}
 {{/each}}
 
-Based on this information, determine if the device has entered, exited, or remained within the allowed perimeter. Return 'entry', 'exit', or 'none' for breachType. If there is a breach, provide a descriptive alertMessage explaining the situation.
+Based on this information, determine the breachType ('exit' or 'none') and provide a concise alertMessage. For an 'exit', the message should state that the device is outside the allowed area. For 'none', it should state the device is within the area.
 `,
 });
 

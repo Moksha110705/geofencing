@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Breach } from "@/types";
-import { ListChecks, LogIn, LogOut } from "lucide-react";
+import { ListChecks, LogOut } from "lucide-react";
 import { ClientTime } from "./client-time";
 
 interface BreachHistoryProps {
@@ -23,9 +23,6 @@ interface BreachHistoryProps {
 }
 
 function BreachEvent({ breachType }: { breachType: Breach['breachType'] }) {
-  if (breachType === "entry") {
-    return <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-800"><LogIn className="mr-1 h-3 w-3" />Entry</Badge>;
-  }
   if (breachType === "exit") {
     return <Badge variant="destructive" className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-800"><LogOut className="mr-1 h-3 w-3" />Exit</Badge>;
   }

@@ -6,12 +6,6 @@ export interface Device {
   organization: string;
 }
 
-export interface LocationRecord {
-  latitude: number;
-  longitude: number;
-  timestamp: string;
-}
-
 export interface Breach extends DetermineEntryExitOutput {
   id: string;
   deviceId: string;

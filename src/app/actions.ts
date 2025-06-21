@@ -17,13 +17,6 @@ export async function checkDeviceLocation(
   latitude: number,
   longitude: number
 ) {
-  // In a real app, you would fetch recent locations from a database.
-  // Here we mock some previous locations.
-  const previousLocations = [
-    { latitude: 34.0520, longitude: -118.2440, timestamp: new Date(Date.now() - 60000).toISOString() },
-    { latitude: 34.0521, longitude: -118.2439, timestamp: new Date(Date.now() - 120000).toISOString() },
-  ];
-
   const input: DetermineEntryExitInput = {
     deviceId,
     organizationName,
@@ -32,7 +25,6 @@ export async function checkDeviceLocation(
       longitude,
       timestamp: new Date().toISOString(),
     },
-    previousLocations,
     allowedPerimeter: MOCK_ALLOWED_PERIMETER
   };
 
