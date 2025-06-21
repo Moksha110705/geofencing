@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Breach } from "@/types";
-import { AlertTriangle, ListChecks, LogIn, LogOut } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { ListChecks, LogIn, LogOut } from "lucide-react";
+import { ClientTime } from "./client-time";
 
 interface BreachHistoryProps {
   breaches: Breach[];
@@ -64,7 +64,7 @@ export function BreachHistory({ breaches }: BreachHistoryProps) {
                     </TableCell>
                     <TableCell className="text-muted-foreground">{breach.alertMessage}</TableCell>
                     <TableCell className="text-right text-muted-foreground text-xs">
-                      {formatDistanceToNow(new Date(breach.timestamp), { addSuffix: true })}
+                      <ClientTime timestamp={breach.timestamp} />
                     </TableCell>
                   </TableRow>
                 ))}
